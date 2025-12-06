@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    // Expecting "Bearer TOKEN"
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
@@ -14,7 +13,7 @@ const authenticateToken = (req, res, next) => {
         if (err) {
             return res.status(403).json({ message: 'Invalid Access Token' });
         }
-        req.user = user; // user payload from token (usually { id: ... })
+        req.user = user; 
         next();
     });
 };

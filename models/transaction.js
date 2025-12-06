@@ -20,7 +20,7 @@ const Transaction = sequelize.define('Transaction', {
         allowNull: false
     },
     date: {
-        type: DataTypes.DATEONLY, // Or DATE if time matters
+        type: DataTypes.DATEONLY, 
         defaultValue: DataTypes.NOW,
         allowNull: false
     },
@@ -28,7 +28,6 @@ const Transaction = sequelize.define('Transaction', {
         type: DataTypes.STRING,
         allowNull: true
     }
-    // walletId association will be added in models/index.js
 });
 
 module.exports = Transaction;

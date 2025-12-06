@@ -4,10 +4,9 @@ const { Op } = require('sequelize');
 exports.getMonthlyReport = async (req, res) => {
     try {
         const userId = req.user.id;
-        const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+        const currentMonth = new Date().toISOString().slice(0, 7); 
         const month = req.query.month || currentMonth;
 
-        // Use Wallet inclusion to ensure we filter by user's transactions
         const walletInclude = {
             model: Wallet,
             where: { userId },

@@ -3,11 +3,9 @@ const { Op } = require('sequelize');
 
 exports.setBudget = async (req, res) => {
     try {
-        const { category, amount, month } = req.body; // month format 'YYYY-MM'
+        const { category, amount, month } = req.body; 
         const userId = req.user.id;
 
-        // Build unique constraint check or update if exists logic?
-        // Requirement says "Set a budget". Usually implies create or update.
         let budget = await Budget.findOne({ where: { userId, category, month } });
 
         if (budget) {
@@ -31,17 +29,14 @@ exports.setBudget = async (req, res) => {
 exports.getBudgets = async (req, res) => {
     try {
         const userId = req.user.id;
-        const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+        const currentMonth = new Date().toISOString().slice(0, 7); 
 
-        // Allow querying for other months if needed, defaults to current
         const month = req.query.month || currentMonth;
 
         const budgets = await Budget.findAll({
             where: { userId, month }
         });
 
-        // Calculate spending for each category
-        // This part is "extra" but very helpful for the user: "Allow users to... track spending against budget"
         const result = await Promise.all(budgets.map(async (b) => {
             const budgetData = b.toJSON();
 
@@ -49,7 +44,7 @@ exports.getBudgets = async (req, res) => {
                 where: {
                     category: b.category,
                     type: 'expense',
-                    date: { [Op.startsWith]: month } // Matches YYYY-MM-DD
+                    date: { [Op.startsWith]: month } 
                 },
                 include: [{
                     model: Wallet,
@@ -60,7 +55,7 @@ exports.getBudgets = async (req, res) => {
             budgetData.spent = totalSpent || 0;
             budgetData.remaining = budgetData.amount - (totalSpent || 0);
 
-            // Notify if approaching limit (simple flag in response)
+            
             if (budgetData.spent >= budgetData.amount) {
                 budgetData.alert = "Budget Exceeded!";
             } else if (budgetData.spent >= budgetData.amount * 0.9) {

@@ -16,7 +16,6 @@ const Wallet = sequelize.define('Wallet', {
         defaultValue: 0.00,
         allowNull: false
     }
-    // userId association will be added in models/index.js
 });
 
 module.exports = Wallet;

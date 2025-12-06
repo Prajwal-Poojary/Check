@@ -2,19 +2,16 @@ const { Transaction, Wallet, User } = require('../models');
 const { Op } = require('sequelize');
 
 exports.addTransaction = async (req, res) => {
-    const t = await require('../config/database').transaction(); // Start a DB transaction
+    const t = await require('../config/database').transaction(); 
     try {
         const { walletId, type, amount, category, date, description } = req.body;
         const userId = req.user.id;
-
-        // Verify wallet belongs to user
         const wallet = await Wallet.findOne({ where: { id: walletId, userId } });
         if (!wallet) {
             await t.rollback();
             return res.status(404).json({ message: 'Wallet not found' });
         }
 
-        // Create Transaction
         const transaction = await Transaction.create({
             walletId,
             type,
@@ -24,7 +21,6 @@ exports.addTransaction = async (req, res) => {
             description
         }, { transaction: t });
 
-        // Update Wallet Balance
         let newBalance = Number(wallet.balance);
         if (type === 'income') {
             newBalance += Number(amount);
@@ -35,7 +31,6 @@ exports.addTransaction = async (req, res) => {
         wallet.balance = newBalance;
         await wallet.save({ transaction: t });
 
-        // Commit DB transaction
         await t.commit();
 
         res.status(201).json(transaction);
@@ -52,19 +47,16 @@ exports.getTransactions = async (req, res) => {
 
         const whereClause = {};
 
-        // Filter by wallet if provided, AND check if wallet belongs to user
-        // To do this efficiently, we can include the Wallet model
         const includeWallet = {
             model: Wallet,
             where: { userId },
-            attributes: [] // Don't need wallet fields in result, just filtration
+            attributes: [] 
         };
 
         if (walletId) {
             includeWallet.where.id = walletId;
         }
 
-        // Date range filter
         if (startDate && endDate) {
             whereClause.date = {
                 [Op.between]: [startDate, endDate]
@@ -96,7 +88,7 @@ exports.deleteTransaction = async (req, res) => {
         const transaction = await Transaction.findByPk(transactionId, {
             include: [{
                 model: Wallet,
-                where: { userId } // Ensure user owns the wallet of this transaction
+                where: { userId } 
             }]
         });
 
@@ -107,7 +99,6 @@ exports.deleteTransaction = async (req, res) => {
 
         const wallet = transaction.Wallet;
 
-        // Revert balance
         let newBalance = Number(wallet.balance);
         if (transaction.type === 'income') {
             newBalance -= Number(transaction.amount);

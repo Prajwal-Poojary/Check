@@ -16,11 +16,9 @@ const Budget = sequelize.define('Budget', {
         allowNull: false
     },
     month: {
-        // Storing as 'YYYY-MM' string is simple and effective for monthly budgets
         type: DataTypes.STRING,
         allowNull: false
     }
-    // userId association will be added in models/index.js
 });
 
 module.exports = Budget;
